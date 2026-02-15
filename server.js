@@ -13,13 +13,22 @@ app.get('/api/users/:id', (req, res) => {
     res.json(extensionData[userId] || { theme: null, nameEffect: null, bgUrl: null, isWeb3GL: false, badges: [] });
 });
 
-// Endpoint: Update user settings
 app.post('/api/users/update', (req, res) => {
-    const { userId, theme, nameEffect, bgUrl, isWeb3GL } = req.body;
-    // In production, you MUST verify the user's identity here so people can't spoof updates
+    // We now accept the new customization variables
+    const { userId, bgUrl, nameEffect, isWeb3GL, nameplateUrl, glassBlur } = req.body;
+    
     if (!extensionData[userId]) extensionData[userId] = { badges: [] };
     
-    extensionData[userId] = { ...extensionData[userId], theme, nameEffect, bgUrl, isWeb3GL };
+    // Save everything to the user's profile
+    extensionData[userId] = { 
+        ...extensionData[userId], 
+        bgUrl, 
+        nameEffect, 
+        isWeb3GL, 
+        nameplateUrl, 
+        glassBlur: glassBlur || "12px" 
+    };
+    
     res.json({ success: true });
 });
 
@@ -37,5 +46,6 @@ app.post('/api/admin/giveBadge', (req, res) => {
     }
     res.json({ success: true, badges: extensionData[targetUserId].badges });
 });
+
 
 app.listen(3000, () => console.log('Pekora Extension API running on port 3000'));
